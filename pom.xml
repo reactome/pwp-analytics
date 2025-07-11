@@ -1,30 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-    <!-- POM file generated with GWT webAppCreator -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"><!-- POM file generated with GWT webAppCreator -->
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>org.reactome.web.utils</groupId>
-    <artifactId>analytics</artifactId>
-    <version>2.1.4-SNAPSHOT</version>
-    <packaging>jar</packaging>
 
     <parent>
         <groupId>org.reactome.maven</groupId>
         <artifactId>reactome-pwp-parent</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4</version>
     </parent>
+
+    <groupId>org.reactome.web.utils</groupId>
+    <artifactId>analytics</artifactId>
+    <version>2.1.4</version>
+    <packaging>jar</packaging>
 
     <name>Analytics Helper</name>
     <description>Google Analytics helper</description>
     <url>https://github.com/reactome/pwp-analytics</url>
-
     <organization>
         <name>Reactome</name>
         <url>https://reactome.org</url>
     </organization>
-
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -63,6 +58,22 @@
         <developerConnection>scm:git:ssh://github.com/reactome/pwp-analytics.git</developerConnection>
         <url>https://github.com/reactome/pwp-analytics/tree/master</url>
     </scm>
+    <!-- Configures the distribution to nexus repository -->
+    <distributionManagement>
+        <!-- Sonatype Release repo -->
+        <repository>
+            <id>ossrh</id>
+            <name>Sonatype Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+
+        <!-- Sonatype SNAPSHOT repo -->
+        <snapshotRepository>
+            <id>ossrh</id>
+            <name>Sonatype Snapshot Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <properties>
         <!-- Convenience property to set the GWT version -->
@@ -76,11 +87,6 @@
 
         <appModule>org.reactome.web.utils.analytics.GoogleAnalytics</appModule>
         <appName>${appModule}</appName>
-
-        <maven.gpg.version>3.2.7</maven.gpg.version>
-        <maven.javadoc.version>3.11.2</maven.javadoc.version>
-        <maven.release.version>3.3.1</maven.release.version>
-        <nexus-staging-maven-plugin>1.7.0</nexus-staging-maven-plugin>
     </properties>
 
     <dependencies>
@@ -134,10 +140,49 @@
 
     </dependencies>
 
-    <build>
-        <!-- Generate compiled stuff in the folder used for developing mode -->
-        <outputDirectory>${webappDirectory}/WEB-INF/classes</outputDirectory>
+    <repositories>
+        <!-- EBI repo -->
+        <repository>
+            <id>nexus-ebi-repo</id>
+            <name>The EBI internal repository</name>
+            <url>https://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!-- EBI SNAPSHOT repo -->
+        <repository>
+            <id>nexus-ebi-snapshot-repo</id>
+            <name>The EBI internal snapshot repository</name>
+            <url>https://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
 
+    <build><!-- Generate compiled stuff in the folder used for developing mode -->
+        <outputDirectory>${webappDirectory}/WEB-INF/classes</outputDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -244,8 +289,21 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>tidy-maven-plugin</artifactId>
+                <version>${maven.tidy.version}</version>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-
         <!-- scp support for deployment (MVN 3) -->
         <extensions>
             <extension>
@@ -255,65 +313,4 @@
             </extension>
         </extensions>
     </build>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>central</id>
-            <name>Central Repository</name>
-            <url>https://repo.maven.apache.org/maven2</url>
-            <layout>default</layout>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-
-    <!-- Configures the distribution to nexus repository -->
-    <distributionManagement>
-        <!-- Sonatype Release repo -->
-        <repository>
-            <id>ossrh</id>
-            <name>Sonatype Release Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository>
-
-        <!-- Sonatype SNAPSHOT repo -->
-        <snapshotRepository>
-            <id>ossrh</id>
-            <name>Sonatype Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <repositories>
-        <!-- EBI repo -->
-        <repository>
-            <id>nexus-ebi-repo</id>
-            <name>The EBI internal repository</name>
-            <url>https://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <!-- EBI SNAPSHOT repo -->
-        <repository>
-            <id>nexus-ebi-snapshot-repo</id>
-            <name>The EBI internal snapshot repository</name>
-            <url>https://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-
 </project>
